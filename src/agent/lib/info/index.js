@@ -9,6 +9,7 @@ import sys from '../sys.js';
 import swift from '../darwin/swift.js';
 import strings from '../strings.js';
 import utils from '../utils.js';
+import Table from 'easy-table';
 'use strict';
 
 async function dumpInfo () {
@@ -327,17 +328,20 @@ function listExportsJson (args) {
 }
 
 function listSegmentsHere () {
-  const headers = 'vaddr    \tvsize\tperm\tname\n'.concat('――――――――――――――――――――――――――――――――――――――――――――――\n');
+  const t = new Table();
   const here = ptr(global.r2frida.offset);
   const moduleAddr = Process.enumerateModules()
     .filter(m => here.compare(m.base) >= 0 && here.compare(m.base.add(m.size)) < 0)
     .map(m => m.base);
   const segment = utils.belongsTo(listSegmentsJson(moduleAddr), here);
-  return headers.concat(segment
-    .map(({ vmaddr, vmsize, perm, name }) => {
-      return [vmaddr, vmsize, perm, name].join('\t');
-    })
-    .join('\n'));
+  segment.forEach(({ vmaddr, vmsize, perm, name }) => {
+    t.cell('vmaddr', vmaddr);
+    t.cell('vmsize', vmsize);
+    t.cell('perm', perm);
+    t.cell('name', name);
+    t.newRow();
+  });
+  return t.toString();
 }
 
 function listSegmentsR2 (args) {
@@ -351,12 +355,15 @@ function listSegmentsR2 (args) {
 }
 
 function listSegments (args) {
-  const headers = 'vaddr    \tvsize\tperm\tname\n'.concat('――――――――――――――――――――――――――――――――――――――――――――――\n');
-  return headers.concat(listSegmentsJson(args)
-    .map(({ vmaddr, vmsize, perm, name }) => {
-      return [vmaddr, vmsize, perm, name].join('\t');
-    })
-    .join('\n'));
+  const t = new Table();
+  listSegmentsJson(args).forEach(({ vmaddr, vmsize, perm, name }) => {
+    t.cell('vmaddr', vmaddr);
+    t.cell('vmsize', vmsize);
+    t.cell('perm', perm);
+    t.cell('name', name);
+    t.newRow();
+  });
+  return t.toString();
 }
 
 function listSegmentsJson (args) {
@@ -380,17 +387,19 @@ function listSegmentsJson (args) {
 }
 
 function listSectionsHere () {
-  const headers = 'vaddr    \tvsize\tperm\tname\n'.concat('――――――――――――――――――――――――――――――――――――――――――――――\n');
+  const t = new Table();
   const here = ptr(global.r2frida.offset);
   const moduleAddr = Process.enumerateModules()
     .filter(m => here.compare(m.base) >= 0 && here.compare(m.base.add(m.size)) < 0)
     .map(m => m.base);
   const section = utils.belongsTo(listSectionsJson(moduleAddr), here);
-  return headers.concat(section
-    .map(({ vmaddr, vmsize, perm, name }) => {
-      return [vmaddr, vmsize, perm, name].join('\t');
-    })
-    .join('\n'));
+  section.forEach(({ vmaddr, vmsize, perm, name }) => {
+    t.cell('vmaddr', vmaddr);
+    t.cell('vmsize', vmsize);
+    t.cell('perm', perm);
+    t.cell('name', name);
+    t.newRow();
+  });
 }
 
 function listSectionsR2 (args) {
@@ -403,12 +412,16 @@ function listSectionsR2 (args) {
 }
 
 function listSections (args) {
-  const headers = 'vaddr    \tvsize\tperm\tname\n'.concat('――――――――――――――――――――――――――――――――――――――――――――――\n');
-  return headers.concat(listSectionsJson(args)
-    .map(({ vmaddr, vmsize, perm, name }) => {
-      return [vmaddr, vmsize, perm, name].join('\t');
-    })
-    .join('\n'));
+  const t = new Table();
+  listSectionsJson(args)
+    .forEach(({ vmaddr, vmsize, perm, name }) => {
+      t.cell('vmaddr', vmaddr);
+      t.cell('vmsize', vmsize);
+      t.cell('perm', perm);
+      t.cell('name', name);
+      t.newRow();
+    });
+  return t.toString();
 }
 
 function listSectionsJson (args) {

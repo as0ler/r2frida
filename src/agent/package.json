@@ -5,11 +5,8 @@
   "private": true,
   "main": "src/agent/index.js",
   "scripts": {
-    "lint": "semistandard src/agent/*.js",
-    "indent": "semistandard --fix src/agent/*.js",
-    "prepare": "npm run build",
-    "build": "cd src/agent && npm run build",
-    "watch": "cd src/agent && npm run watch"
+    "build": "frida-compile -Sco _agent.js index.js",
+    "watch": "frida-compile -Sco _agent.js -w index.js"
   },
   "license": "LGPL-3.0",
   "dependencies": {
